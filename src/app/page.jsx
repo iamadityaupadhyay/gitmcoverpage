@@ -377,7 +377,7 @@ export default function LabFileCover() {
                     {formData.session})
                   </p>
                   <div className="text-5xl font-bold mb-10 mt-4 justify-center flex">
-                    <img src="gitm.png" alt="College Logo" className="h-96"/>
+                    <img src="gitm.png" alt="College Logo" className="h-80"/>
                   </div>
                   <h3 className="text-2xl font-serif font-bold uppercase">
                     {formData.course}
