@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🎒 Bunk Master Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Comic Sans MS';
+            background: linear-gradient(135deg, #91822b, #FF69B4);
+            min-height: 100vh;
+            width: 100%;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .calculator-container {
+            background: white;
+            padding: 2rem;
+            font-size: clamp(16px, 4vw, 25px);
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            width: min(90%, 800px);
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            text-align: center;
+            color: #FF4081;
+            margin-bottom: 20px;
+            font-size: clamp(24px, 5vw, 36px);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        h3 {
+            color: #FF4081;
+            text-align: center;
+            margin: 15px 0;
+            font-size: clamp(20px, 4vw, 28px);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: clamp(14px, 3vw, 20px);
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 3px solid #FFD700;
+            border-radius: 10px;
+            font-size: clamp(14px, 3vw, 18px);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            transform: scale(1.02);
+            border-color: #FF4081;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #FF4081;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: clamp(16px, 3.5vw, 22px);
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            font-family: 'Comic Sans MS', cursive;
+        }
+
+        button:hover {
+            transform: scale(1.02);
+            background: #FF1744;
+        }
+
+        #result {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: clamp(14px, 3vw, 18px);
+            display: none;
+            word-wrap: break-word;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .good-attendance { background: #E8F5E9; color: #2E7D32; }
+        .warning-attendance { background: #FFF3E0; color: #EF6C00; }
+        .danger-attendance { background: #FFEBEE; color: #C62828; }
+
+        .emoji {
+            font-size: clamp(24px, 6vw, 48px);
+            margin: 10px 0;
+            animation: spin 2s infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .day-card {
+            background: #E3F2FD;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #90CAF9;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .day-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+
+        .day-name {
+            font-weight: bold;
+            color: #1976D2;
+            font-size: clamp(12px, 2.5vw, 16px);
+            margin-bottom: 5px;
+        }
+
+        .day-date {
+            font-size: clamp(12px, 2.5vw, 16px);
+            color: #2196F3;
+        }
+
+        .projected-attendance {
+            margin-top: 10px;
+            padding: 8px;
+            background: #E8F5E9;
+            border-radius: 8px;
+            text-align: center;
+            color: #2E7D32;
+            font-weight: bold;
+            font-size: clamp(12px, 2.5vw, 16px);
+        }
+        .projected-attendance-absent {
+            margin-top: 10px;
+            padding: 8px;
+            background: #FFEBEE;
+            border-radius: 8px;
+            text-align: center;
+            color: #C62828;
+            font-weight: bold;
+            font-size: clamp(12px, 2.5vw, 16px);
+        }
+
+        #projectionSection {
+            display: none;
+            margin: 20px 0;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        #attendanceChart, #projectionChart {
+            margin-top: 20px;
+            max-width: 100%;
+            height: auto;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(135deg, #91822b, #FF69B4);
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            font-size: clamp(12px, 2.5vw, 16px);
+            animation: slideUp 0.5s ease-in-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media screen and (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .calculator-container {
+                padding: 1.5rem;
+                width: 100%;
+            }
+
+            .days-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <h1>🎒 Bunk Master Pro</h1>
+        <div class="input-group">
+            <label>✨ Your Name:</label>
+            <input type="text" id="name" placeholder="Enter your name">
+        </div>
+        <div class="input-group">
+            <label>📚 Total Lectures:</label>
+            <input type="number" id="totalLectures" placeholder="Total number of lectures">
+        </div>
+        <div class="input-group">
+            <label>✅ Lectures Attended:</label>
+            <input type="number" id="presentLectures" placeholder="Lectures you attended">
+        </div>
+        <div class="input-group">
+            <label>🎯 Target Attendance (default=75):</label>
+            <input type="number" value="75" id="required" placeholder="Target (Default=75)">
+        </div>
+        <div class="input-group">
+            <label>📅 Lectures per day (default=6):</label>
+            <input type="number" value="6" id="classes" placeholder="Lectures per day">
+        </div>
+        
+        <button onclick="calculateAttendance()">Calculate My Destiny! 🎲</button>
+        <div id="result"></div>
+
+        <!-- Chart Section -->
+        <div id="chartSection">
+            <h3>📊 Attendance Trends</h3>
+            <canvas id="attendanceChart"></canvas>
+        </div>
+
+        <!-- Projection Chart Section -->
+        <div id="projectionChartSection">
+            <h3>📈 Projected Attendance Over Days</h3>
+            <canvas id="projectionChart"></canvas>
+        </div>
+
+        <div id="projectionSection">
+            <h3>📅 Projected Attendance for Next Classes</h3>
+            <div class="days-grid" id="nextDays"></div>
+        </div>
+        <div class="input-group">
+            <h1 >Planning for Leave?</h1>
+            <label>📅 Days of Leave:</label>
+            <h6 class="leave"></h6>
+            <br>
+            <input type="number" id="leaveDays" placeholder="Enter days of leave">
+        </div>
+        <button onclick="calculateAttendance()">Calculate My Destiny! 🎲</button>
+    </div>
+    <footer>
+        All rights Reserved ©️ <a style="color:#E8F5E9" href="https://adityaupadhyay.vercel.app" target="_blank">Aditya Upadhyay</a>   
+    </footer>
+    <script>
+        let myChart, projectionChart;
+
+        function loadUserData() {
+            const name = localStorage.getItem('name');
+            const totalLectures = localStorage.getItem('totalLectures');
+            const presentLectures = localStorage.getItem('presentLectures');
+            const required = localStorage.getItem('required');
+            const classes = localStorage.getItem('classes');
+            const leaveDays = localStorage.getItem('leaveDays');
+
+            if (name) document.getElementById('name').value = name;
+            if (totalLectures) document.getElementById('totalLectures').value = totalLectures;
+            if (presentLectures) document.getElementById('presentLectures').value = presentLectures;
+            if (required) document.getElementById('required').value = required;
+            if (classes) document.getElementById('classes').value = classes;
+            if (leaveDays) document.getElementById('leaveDays').value = leaveDays;
+        }
+
+        function saveUserData() {
+            localStorage.setItem('name', document.getElementById('name').value);
+            localStorage.setItem('totalLectures', document.getElementById('totalLectures').value);
+            localStorage.setItem('presentLectures', document.getElementById('presentLectures').value);
+            localStorage.setItem('required', document.getElementById('required').value);
+            localStorage.setItem('classes', document.getElementById('classes').value);
+            localStorage.setItem('leaveDays', document.getElementById('leaveDays').value);
+        }
+
+        function updateChart(totalLectures, presentLectures, required) {
+            const ctx = document.getElementById('attendanceChart').getContext('2d');
+            if (myChart) myChart.destroy(); // Destroy existing chart
+
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Current Attendance', 'Target Attendance'],
+                    datasets: [{
+                        label: 'Attendance Percentage',
+                        data: [(presentLectures / totalLectures * 100).toFixed(2), required],
+                        backgroundColor: ['#FF4081', '#FFD700'],
+                        borderColor: ['#FF1744', '#FFC107'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Percentage (%)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateProjectionChart(totalLectures, presentLectures, classes, leaveDays) {
+            const ctx = document.getElementById('projectionChart').getContext('2d');
+            if (projectionChart) projectionChart.destroy(); // Destroy existing chart
+
+            const labels = [];
+            const presentData = [];
+            const absentData = [];
+            const leaveData = [];
+
+            for (let i = 1; i <= 6; i++) {
+                labels.push(`Day ${i}`);
+                presentData.push(((presentLectures + i * classes) / (totalLectures + i * classes) * 100).toFixed(2));
+                absentData.push(((presentLectures) / (totalLectures + i * classes) * 100).toFixed(2));
+                
+            }
+            for(let i=1;i<=leaveDays;i++){
+                leaveData.push(((presentLectures) / (totalLectures + i * classes) * 100).toFixed(2));
+            }
+            const leave = document.querySelector(".leave")
+            
+            leave.innerHTML=`Your final attendance percentage will be ${leaveData.pop()}%`
+            projectionChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Present',
+                            data: presentData,
+                            borderColor: '#2E7D32',
+                            fill: false
+                        },
+                        {
+                            label: 'Absent',
+                            data: absentData,
+                            borderColor: '#C62828',
+                            fill: false
+                        },
+                        {
+                            label: 'On Leave',
+                            data: leaveData,
+                            borderColor: '#FFD700',
+                            fill: false,
+                            borderDash: [5, 5]
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            
+                            max: presentData[5]+30,
+
+                            title: {
+                                display: true,
+                                text: 'Percentage (%)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateProjectionCalendar(totalLectures, presentLectures) {
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const nextDaysDiv = document.getElementById('nextDays');
+            const today = new Date();
+            
+            let currentDate = new Date(today);
+            let daysAdded = 0;
+            nextDaysDiv.innerHTML = '';
+            const classes = parseInt(document.getElementById('classes').value);
+
+            while (daysAdded < 6) {
+                currentDate.setDate(currentDate.getDate() + 1);
+                if (currentDate.getDay() !== 0) { 
+                    const projectedAttendance = ((presentLectures + (daysAdded + 1)*classes) / (totalLectures + (daysAdded + 1)*classes) * 100);
+                    const projectedAttendanceAbsent = ((presentLectures) / (totalLectures + (daysAdded + 1)*classes) * 100);
+                    
+                    const dayCard = document.createElement('div');
+                    dayCard.className = 'day-card';
+                    dayCard.innerHTML = `
+                        <div class="day-name">${days[currentDate.getDay()]}</div>
+                        <div class="day-date">${currentDate.toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric' 
+                        })}</div>
+                        <div class="projected-attendance">
+                            Present: ${projectedAttendance.toFixed(2)}%
+                        </div>
+                        <div class="projected-attendance-absent">
+                            Absent: ${projectedAttendanceAbsent.toFixed(2)}%
+                        </div>
+                    `;
+                    nextDaysDiv.appendChild(dayCard);
+                    daysAdded++;
+                }
+            }
+            document.getElementById('projectionSection').style.display = 'block';
+        }
+
+        function calculateAttendance() {
+            const name = document.getElementById('name').value;
+            const totalLectures = parseInt(document.getElementById('totalLectures').value);
+            const presentLectures = parseInt(document.getElementById('presentLectures').value);
+            const required = parseInt(document.getElementById('required').value);
+            const classes = parseInt(document.getElementById('classes').value);
+            const leaveDays = parseInt(document.getElementById('leaveDays').value) || 0;
+            
+            if (!name || !totalLectures || !presentLectures) {
+                alert("Please fill all fields! 🙏");
+                return;
+            }
+            
+            if (presentLectures > totalLectures) {
+                alert("You can't attend more lectures than total lectures! 🤔");
+                return;
+            }
+
+            const attendancePercentage = (presentLectures / totalLectures) * 100;
+            const projectedAttendance = ((presentLectures + classes) / (totalLectures + classes) * 100);
+            const resultDiv = document.getElementById('result');
+            let message = '';
+            let className = '';
+            let emoji = '';
+
+            if (attendancePercentage >= 75) {
+                if (!required){
+                    message = `🌟 Wow ${name}! Your attendance is ${attendancePercentage.toFixed(2)}%\n
+                          You can safely bunk ${Math.ceil((-totalLectures*(75/100)+presentLectures )/(75/100))} more lectures!\n
+                          You're crushing it! 🚀`;
+                className = 'good-attendance';
+                emoji = '😎'; 
+                }
+                else{
+                if (required>75 ){
+                    if (required<=attendancePercentage){
+                        console.log("Hello here")
+                        message = `🌟 Wow ${name}! Your attendance is ${attendancePercentage.toFixed(2)}%\n
+                           You can safely bunk ${Math.ceil((-totalLectures*(required/100)+presentLectures )/(required/100))} more lectures!\n
+                          You're crushing it! 🚀`;
+                          className = 'good-attendance';
+                    }
+                    else{
+                        console.log("Ima in")
+                    message = `🌟 Wow ${name}! Your attendance is ${attendancePercentage.toFixed(2)}%\n
+                          You Have to attend ${-(Math.floor(((100*presentLectures)-(required*totalLectures))/(100-required)))}more lectures! for ${required}% \n
+                          You're crushing it! 🚀`;
+                          className = 'good-attendance';
+                        }
+                }
+                else{
+                message = `🌟 Wow ${name}! Your attendance is ${attendancePercentage.toFixed(2)}%\n
+                          You can safely bunk ${Math.ceil((-totalLectures*(required/100)+presentLectures )/(required/100))} more lectures!\n
+                          You're crushing it! 🚀`;
+                className = 'good-attendance';
+                emoji = '😎';}
+                }
+            } else if (attendancePercentage >= 65) {
+                if (!required){
+                    message = `😅 Heads up ${name}! Your attendance is ${attendancePercentage.toFixed(2)}%\n
+                          You need to attend${Math.ceil(3*totalLectures-4*presentLectures)} more lectures to reach 75%!\n
+                          No more bunking for now!`;
+                className = 'warning-attendance';
+                emoji = '😰';
+                }
+                else{
+                message = `😅 Heads up ${name}! Your attendance is ${attendancePercentage.toFixed(2)}%\n
+                          You need to attend ${-(Math.floor(((100*presentLectures)-(required*totalLectures))/(100-required)))}   more lectures (Approx ${-(Math.ceil((((100*presentLectures)-(required*totalLectures))/(100-required)))/classes)} days)to reach ${required}%!\
+                          No more bunking for now!`; className = 'warning-attendance';
+                          emoji = '😰';
+                }
+            } else {
+                if (!required){
+                    message = `💀 Oh no ${name}! Your attendance is ${attendancePercentage.toFixed(2)}%\n
+                          You need to attend ${Math.ceil(3*totalLectures-4*presentLectures)} more lectures to reach 75%!\n
+                          Time to become a good student!`;
+                          
+                }
+                else{
+                console.log("I am in")
+                message = `💀 Oh no ${name}! Your attendance is ${attendancePercentage.toFixed(2)}%\n
+                          You need to attend ${-(Math.ceil(((100*presentLectures)-(required*totalLectures))/(100-required)
+                        
+                        ))}  more lectures (Approx ${-(Math.ceil(((((100*presentLectures)-(required*totalLectures))/(100-required)))/classes))} days)to reach ${required}%!\n
+                          Time to become a good student!`;}
+                className = 'danger-attendance';
+                emoji = '😱';
+            }
+
+            if (leaveDays > 0) {
+                const leaveAttendance = ((presentLectures) / (totalLectures + leaveDays * classes) * 100).toFixed(2);
+                message += `\n\nIf you take ${leaveDays} days leave, your attendance will drop to ${leaveAttendance}%.`;
+            }
+
+            message += `\n\nIf you attend next day classes:\nFinal projected attendance will be ${projectedAttendance.toFixed(2)}%`;
+
+            resultDiv.innerHTML = `
+                <div class="emoji">${emoji}</div>
+                ${message.split('\n').join('<br>')}
+            `;
+            resultDiv.className = className;
+            resultDiv.style.display = 'block';
+            saveUserData();
+            updateProjectionCalendar(totalLectures, presentLectures);
+            updateChart(totalLectures, presentLectures, required);
+            updateProjectionChart(totalLectures, presentLectures, classes, leaveDays);
+        }
+
+        loadUserData();
+    </script>
+</body>
+</html>
