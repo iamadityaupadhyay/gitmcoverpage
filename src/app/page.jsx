@@ -359,7 +359,7 @@ export default function LabFileCover() {
           <div id="print-content">
             <div className="a4-sheet">
               <div className="text-center  space-y-4">
-                <div className="mb-12">
+                <div className="mt-5  mb-9">
                   <h1 className="text-2xl  font-serif font-bold uppercase">
                     Goel Institute of Technology and Management, Lucknow
                   </h1>
@@ -371,12 +371,12 @@ export default function LabFileCover() {
                   </h2>
                 </div>
 
-                <div className="mb-20">
+                <div className="mb-14">
                   <p className="text-2xl mb-4">
                     {formData.semester % 2 === 0 ? "Even" : "Odd"} Semester (
                     {formData.session})
                   </p>
-                  <div className="text-5xl font-bold mb-10 mt-10 justify-center flex">
+                  <div className="text-5xl font-bold mb-10 mt-4 justify-center flex">
                     <img src="gitm.png" alt="College Logo" className="h-96"/>
                   </div>
                   <h3 className="text-2xl font-serif font-bold uppercase">
@@ -388,7 +388,7 @@ export default function LabFileCover() {
                   </p>
                 </div>
 
-                <div className="mb-24">
+                <div className="mb-5">
                   <h2 className="text-2xl font-bold">
                     {formData.fileType} File
                   </h2>
