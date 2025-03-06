@@ -393,13 +393,13 @@ export default function LabFileCover() {
                     {formData.fileType} File
                   </h2>
                   <h2 className="text-2xl mt-2">of</h2>
-                  <p className="text-2xl mt-2">{formData.subjectName}</p>
-                  <p className="text-2xl mt-2">{formData.subjectCode}</p>
+                  <p className="text-2xl mt-1.5">{formData.subjectName}</p>
+                  <p className="text-2xl mt-1.5">{formData.subjectCode}</p>
                 </div>
 
                 <div className="flex justify-between max-w-3xl mx-auto">
                   <div className="text-left ">
-                    <p className="text-2xl font-bold mt-10">Submitted By:</p>
+                    <p className="text-2xl font-bold mt-6">Submitted By:</p>
                     <p className="text-2xl mt-4">
                       Name: {formData.submittedByName}
                     </p>
@@ -409,7 +409,7 @@ export default function LabFileCover() {
                   </div>
 
                   <div className="text-right">
-                    <p className="text-2xl font-bold mt-10">Submitted To:</p>
+                    <p className="text-2xl font-bold mt-6">Submitted To:</p>
                     <p className="text-2xl mt-4">
                       Faculty Name: {formData.submittedToName}
                     </p>
