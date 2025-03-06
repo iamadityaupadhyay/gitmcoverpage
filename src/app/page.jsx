@@ -393,7 +393,7 @@ export default function LabFileCover() {
                     {formData.fileType} File
                   </h2>
                   <h2 className="text-2xl mt-2">of</h2>
-                  <p className="text-2xl mt-4">{formData.subjectName}</p>
+                  <p className="text-2xl mt-2">{formData.subjectName}</p>
                   <p className="text-2xl mt-2">{formData.subjectCode}</p>
                 </div>
 
